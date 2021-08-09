@@ -1,0 +1,44 @@
+---
+# tasks file for infra_server_dhcp_dhcpd
+
+# install dhcp server
+- name: install dhcp server
+  ansible.builtin.dnf:
+    name: dhcp-server
+    state: latest
+
+# Copy the /usr/lib/systemd/system/dhcpd.service file to the /etc/systemd/system/ directory
+- name: copy the /usr/lib/systemd/system/dhcpd.service file to the /etc/systemd/system/ directory
+  ansible.builtin.copy:
+    src: /usr/lib/systemd/system/dhcpd.service
+    dest: /etc/systemd/system/
+    remote_src: yes
+
+- name: append listening network interfaces name to the ExecStart parameter
+  ansible.builtin.template:
+    src: dhcpd.service.j2
+    dest: /usr/lib/systemd/system/dhcpd.service
+
+# Reload the systemd manager configuration: 
+- name: reload the systemd manager configuration: 
+  ansible.builtin.systemd:
+    daemon_reload: yes
+
+# restart dhcpd.service
+- name : restart dhcpd.service
+  ansible.builtin.service:
+    name: dhcpd.service
+    state: restarted
+
+# configure dhcpd.service
+- name: configure dhcpd.service
+  ansible.builtin.template:
+    src: dhcpd.conf.j2
+    dest: /etc/dhcp/dhcpd.conf
+
+# enable and start dhcpd.service
+- name: enable and start dhcpd.service
+  ansible.builtin.service:
+    name: dhcpd.service
+    state: started
+    enabled: yes

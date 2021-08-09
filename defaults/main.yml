@@ -1,0 +1,5 @@
+---
+# defaults file for infra_server_dhcp_dhcpd
+
+dhcpd_package: dhcp-server-12:4.4.2-11.b1.fc34
+listening_nic: eth0
