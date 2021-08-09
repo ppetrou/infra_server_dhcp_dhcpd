@@ -3,6 +3,40 @@ default-lease-time 86400;
 
 authoritative;
 
+group {
+  option domain-name-servers 192.0.2.1;
+
+  host server1.example.com {
+    hardware ethernet 52:54:00:72:2f:6e;
+    fixed-address 192.0.2.130;
+  }
+
+  host server2.example.com {
+    hardware ethernet 52:54:00:1b:f3:cf;
+    fixed-address 192.0.2.140;
+  }
+
+  shared-network example {
+    option domain-name-servers 192.0.2.1;
+    ...
+
+    subnet 192.0.2.0 netmask 255.255.255.0 {
+      range 192.0.2.20 192.0.2.100;
+      option routers 192.0.2.1;
+    }
+
+    subnet 198.51.100.0 netmask 255.255.255.0 {
+      range 198.51.100.20 198.51.100.100;
+      option routers 198.51.100.1;
+    }
+    ...
+  }
+}
+
+
+
+
+
 subnet 192.0.2.0 netmask 255.255.255.0 {
   range 192.0.2.20 192.0.2.100;
   option domain-name-servers 192.0.2.1;

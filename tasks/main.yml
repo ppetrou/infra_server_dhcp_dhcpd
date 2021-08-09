@@ -4,17 +4,10 @@
 # install dhcp server
 - name: install dhcp server
   ansible.builtin.dnf:
-    name: dhcp-server
-    state: latest
+    name: "{{ dhcpd_package }}"
+    state: present
 
-# Copy the /usr/lib/systemd/system/dhcpd.service file to the /etc/systemd/system/ directory
-- name: copy the /usr/lib/systemd/system/dhcpd.service file to the /etc/systemd/system/ directory
-  ansible.builtin.copy:
-    src: /usr/lib/systemd/system/dhcpd.service
-    dest: /etc/systemd/system/
-    remote_src: yes
-
-- name: append listening network interfaces name to the ExecStart parameter
+- name: configure dhcpd.service
   ansible.builtin.template:
     src: dhcpd.service.j2
     dest: /usr/lib/systemd/system/dhcpd.service
@@ -31,7 +24,7 @@
     state: restarted
 
 # configure dhcpd.service
-- name: configure dhcpd.service
+- name: configure dhcpd
   ansible.builtin.template:
     src: dhcpd.conf.j2
     dest: /etc/dhcp/dhcpd.conf
