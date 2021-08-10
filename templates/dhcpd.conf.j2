@@ -3,88 +3,47 @@ default-lease-time 86400;
 
 authoritative;
 
-group {
-  option domain-name-servers 192.0.2.1;
+{# render subnets connected to the dhcp server directly #}
+{% for dhcp_subnet in dhcpd_subnets|selectattr("directly_connected_to_interface", "true")|list %}
+{# render all attributes if the server provides a dhcp service to the subnet #} 
+{% if dhcp_subnet.provides_service %}
 
-  host server1.example.com {
-    hardware ethernet 52:54:00:72:2f:6e;
-    fixed-address 192.0.2.130;
+subnet {{ dhcp_subnet.network }} netmask {{ dhcp_subnet.netmask }} {
+  range {{ dhcp_subnet.range }};
+{% for dhcp_option in dhcpd_subnet.options %}
+  {{ dhcp_option }};
+{% endfor %}
+{% for fixed_ip_host in dhcp_subnet.fixed_ip_hosts %}
+  host {{ fixed_ip_host.name }} {
+      hardware ethernet {{ fixed_ip_host.hardware_address }};
+      fixed-address {{ fixed_ip_host.fixed_ip_address }};
   }
+}
+{% else %}
+{# render only network and netmask if the server does not provide a dhcp service to the subnet #} 
+subnet {{ dhcp_subnet.network }} netmask {{ dhcp_subnet.netmask }} {
+}
+{% endif %}
+{% endfor %}
 
-  host server2.example.com {
-    hardware ethernet 52:54:00:1b:f3:cf;
-    fixed-address 192.0.2.140;
-  }
-
-  shared-network example {
-    option domain-name-servers 192.0.2.1;
-    ...
-
-    subnet 192.0.2.0 netmask 255.255.255.0 {
-      range 192.0.2.20 192.0.2.100;
-      option routers 192.0.2.1;
-    }
-
-    subnet 198.51.100.0 netmask 255.255.255.0 {
-      range 198.51.100.20 198.51.100.100;
-      option routers 198.51.100.1;
-    }
-    ...
+{# render shared-networks if we have subnets not connected to dhcp server directly #}
+{% if dhcpd_subnets|selectattr("directly_connected_to_interface", "false")|list|length > 0 %}
+shared-network ext_net_1 {
+{% for dhcp_subnet in dhcpd_subnets|selectattr("directly_connected_to_interface", "false")|list %}  
+  
+subnet {{ dhcp_subnet.network }} netmask {{ dhcp_subnet.netmask }} {
+  range {{ dhcp_subnet.range }};
+{% for dhcp_option in dhcpd_subnet.options %}
+  {{ dhcp_option }};
+{% endfor %}
+{% for fixed_ip_host in dhcp_subnet.fixed_ip_hosts %}
+  host {{ fixed_ip_host.name }} {
+      hardware ethernet {{ fixed_ip_host.hardware_address }};
+      fixed-address {{ fixed_ip_host.fixed_ip_address }};
   }
 }
 
-
-
-
-
-subnet 192.0.2.0 netmask 255.255.255.0 {
-  range 192.0.2.20 192.0.2.100;
-  option domain-name-servers 192.0.2.1;
-  option routers 192.0.2.1;
-  option broadcast-address 192.0.2.255;
-  max-lease-time 172800;
+{% endfor %}
 }
+{% endif %}
 
-shared-network example {
-  option domain-name-servers 192.0.2.1;
-  ...
-
-  subnet 192.0.2.0 netmask 255.255.255.0 {
-    range 192.0.2.20 192.0.2.100;
-    option routers 192.0.2.1;
-  }
-
-  subnet 198.51.100.0 netmask 255.255.255.0 {
-    range 198.51.100.20 198.51.100.100;
-    option routers 198.51.100.1;
-  }
-  ...
-}
-
-
-Add a subnet declaration for the subnet the server is directly connected to and that is used to reach the remote subnets specified in shared-network above: 
-If the server does not provide DHCP service to this subnet, the subnet declaration must be empty as shown in the example. Without a declaration for the directly connected subnet, dhcpd does not start. 
-
-subnet 203.0.113.0 netmask 255.255.255.0 {
-}
-
-
-host server.example.com {
-	hardware ethernet 52:54:00:72:2f:6e;
-	fixed-address 192.0.2.130;
-}
-
-
-group {
-  option domain-name-servers 192.0.2.1;
-
-  host server1.example.com {
-    hardware ethernet 52:54:00:72:2f:6e;
-    fixed-address 192.0.2.130;
-  }
-
-  host server2.example.com {
-    hardware ethernet 52:54:00:1b:f3:cf;
-    fixed-address 192.0.2.140;
-  }
-}

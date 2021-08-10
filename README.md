@@ -1,38 +1,147 @@
 Role Name
 =========
 
-A brief description of the role goes here.
+A simple role to setup a dhcp service in a server with one or multiple nics, serving directly connected or remote subnets.
 
 Requirements
 ------------
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+NA
 
 Role Variables
 --------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+**top level vars**
+|Variable|Level|Description
+|---|---|---	
+|dhcpd_service_nics|Default|A list of network interfaces that listen for dhcp requests
+|dhcpd_subnets|Default|A list of subnets which will be served by the dhcp service
+|dhcpd_package|Default|The dhcpd package in the following format name-[epoch:]. It can be of any valid NEVRA or NSVCA form. https://docs.fedoraproject.org/en-US/modularity/architecture/nsvca/  	
+
+**dhcpd_subnets attributes**
+|dhcpd_subnets|Type|Description
+|---|---|---
+|name|string|The name of the subnet
+|directly_connected_to_interface|boolean|Whether the subnet is connected to a physical nic on the server
+|provides_service|boolean|Whether the subnet is also served by the dhcp service.
+|network|string|The network address of the subnet
+|netmask|string|The netmask address of the subnet
+|range|string|The ip range of the subnet served by the dhcp service
+|options|list(string)|dhcp options for the subnet. See https://www.iana.org/assignments/bootp-dhcp-parameters/bootp-dhcp-parameters.xhtml for full list.
+|fixed_ip_hosts|list(dict)|Fixed hosts in the subnets
+
+**fixed_ip_hosts attributes**
+|fixed_ip_hosts|Type|Description
+|---|---|---
+|name|string|The name of the fixed host
+|hardware_address|string|The MAC address of the host
+|fixed_ip_address|string|The ip address of the host
+
+
+```
+dhcpd_package: dhcp-server-12:4.4.2-11.b1.fc34
+
+dhcpd_service_nics: 
+  - eth0
+
+dhcpd_subnets:
+  - name: test1
+    directly_connected_to_interface: yes
+    provides_service: yes
+    network: a.b.c.d
+    netmask: e.f.g.h
+    range: a.b.c.d e.f.g.h;
+    options:
+      - "option value"
+    fixed_ip_hosts:
+      - name: server1.example.com
+        hardware_address: AA:BB:CC:DD:EE
+        fixed_ip_address: a.b.c.d
+      - name: server2.example.com
+        hardware_address: AA:BB:CC:DD:E1
+        fixed_ip_address: e.f.g.h
+  - name: test2
+    directly_connected_to_interface: yes
+    provides_service: yes
+    network: a.b.c.d
+    netmask: e.f.g.h
+    range: a.b.c.d e.f.g.h;
+    options:
+      - "option value"
+    fixed_ip_hosts:
+      - name: server1.example.com
+        hardware_address: AA:BB:CC:DD:EE
+        fixed_ip_address: a.b.c.d
+      - name: server2.example.com
+        hardware_address: AA:BB:CC:DD:E1
+        fixed_ip_address: e.f.g.h
+```
+
+
+
+
 
 Dependencies
 ------------
+NA
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
 
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+```
+---
+- hosts: dhcp_server
+  become: yes
+  roles:
+    - role: infra_server_dhcp_dhcpd
+      vars:
+        dhcpd_service_nics: 
+          - eth0
+        dhcpd_subnets:
+          - name: test1
+            directly_connected_to_interface: yes
+            provides_service: yes
+            network: a.b.c.d
+            netmask: e.f.g.h
+            range: a.b.c.d e.f.g.h;
+            options:
+              - "option value"
+            fixed_ip_hosts:
+              - name: server1.example.com
+                hardware_address: AA:BB:CC:DD:EE
+                fixed_ip_address: a.b.c.d
+              - name: server2.example.com
+                hardware_address: AA:BB:CC:DD:E1
+                fixed_ip_address: e.f.g.h
+          - name: test2
+            directly_connected_to_interface: yes
+            provides_service: yes
+            network: a.b.c.d
+            netmask: e.f.g.h
+            range: a.b.c.d e.f.g.h;
+            options:
+              - "option value"
+            fixed_ip_hosts:
+              - name: server1.example.com
+                hardware_address: AA:BB:CC:DD:EE
+                fixed_ip_address: a.b.c.d
+              - name: server2.example.com
+                hardware_address: AA:BB:CC:DD:E1
+                fixed_ip_address: e.f.g.h
+```
 
 License
 -------
 
-BSD
+Apache-2.0
 
 Author Information
 ------------------
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+```
+Petros Petrou
+email: ppetrou@gmail.com
+web: www.petrospetrou.co.uk
+```

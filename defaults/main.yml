@@ -1,53 +1,40 @@
 ---
 # defaults file for infra_server_dhcp_dhcpd
 
-dhcpd_package: dhcp-server-12:4.4.2-11.b1.fc34
 dhcpd_service_nics: 
   - eth0
 
-dhcpd_domain_name_servers:
-  - a.b.c.d
-  - e.f.g.h
-
-dhcpd_direct_subnet:
-  network: a.b.c.d
-  netmask: e.f.g.h
-
-dhcpd_fixed_hosts:
-  - name: server1.example.com
-    hardware_address: AA:BB:CC:DD:EE
-    fixed_ip_address: a.b.c.d
-  - name: server2.example.com
-    hardware_address: AA:BB:CC:DD:E1
-    fixed_ip_address: e.f.g.h
-
 dhcpd_subnets:
-  - network: a.b.c.d
+  - name: test1
+    directly_connected_to_interface: yes
+    provides_service: yes
+    network: a.b.c.d
     netmask: e.f.g.h
     range: a.b.c.d e.f.g.h;
     options:
       - "option value"
-
-dhcpd_shared_networks:
-  - name: shared_net_1
-    options:
-      - "option1 value1"
-      - "option2 value2"
-    dhcpd_subnets:
-      - network: a.b.c.d
-        netmask: e.f.g.h
-        range: a.b.c.d e.f.g.h;
-        options:
-          - "option value"
-      - network: a.b.c.d
-        netmask: e.f.g.e
-        range: a.b.c.d e.f.g.h;
-        options:
-          - "option value"
-    dhcpd_fixed_hosts:
+    fixed_ip_hosts:
       - name: server1.example.com
         hardware_address: AA:BB:CC:DD:EE
         fixed_ip_address: a.b.c.d
       - name: server2.example.com
         hardware_address: AA:BB:CC:DD:E1
         fixed_ip_address: e.f.g.h
+  - name: test2
+    directly_connected_to_interface: yes
+    provides_service: yes
+    network: a.b.c.d
+    netmask: e.f.g.h
+    range: a.b.c.d e.f.g.h;
+    options:
+      - "option value"
+    fixed_ip_hosts:
+      - name: server1.example.com
+        hardware_address: AA:BB:CC:DD:EE
+        fixed_ip_address: a.b.c.d
+      - name: server2.example.com
+        hardware_address: AA:BB:CC:DD:E1
+        fixed_ip_address: e.f.g.h
+
+
+
