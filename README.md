@@ -1,7 +1,7 @@
 Role Name
 =========
 
-A simple role to setup a dhcp service in a server with one or multiple nics, serving directly connected or remote subnets.
+A simple role to setup a dhcp service in a server with one or more nics, serving direct or remote subnets.
 
 Requirements
 ------------
