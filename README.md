@@ -16,7 +16,7 @@ Role Variables
 |---|---|---	
 |dhcpd_service_nics|Default|A list of network interfaces that listen for dhcp requests
 |dhcpd_subnets|Default|A list of subnets which will be served by the dhcp service
-|dhcpd_package|Default|The dhcpd package in the following format name-[epoch:]. It can be of any valid NEVRA or NSVCA form. https://docs.fedoraproject.org/en-US/modularity/architecture/nsvca/  	
+|dhcpd_package|Default|The dhcpd package in a valid NEVRA or NSVCA form. https://docs.fedoraproject.org/en-US/modularity/architecture/nsvca/  	
 
 **dhcpd_subnets attributes**
 |dhcpd_subnets|Type|Description
