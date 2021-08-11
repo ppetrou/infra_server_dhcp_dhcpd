@@ -1,0 +1,7 @@
+---
+- name: Converge
+  hosts: dhcpd_server
+  tasks:
+    - name: "Include infra_server_dhcp_dhcpd"
+      include_role:
+        name: "infra_server_dhcp_dhcpd"

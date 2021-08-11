@@ -7,27 +7,22 @@
     name: "{{ dhcpd_package }}"
     state: present
 
+# configure dhcpd.service
 - name: configure dhcpd.service
   ansible.builtin.template:
     src: dhcpd.service.j2
-    dest: /usr/lib/systemd/system/dhcpd.service
+    dest: /etc/systemd/system/dhcpd.service
 
-# Reload the systemd manager configuration: 
-- name: reload the systemd manager configuration: 
-  ansible.builtin.systemd:
-    daemon_reload: yes
-
-# restart dhcpd.service
-- name : restart dhcpd.service
-  ansible.builtin.service:
-    name: dhcpd.service
-    state: restarted
-
-# configure dhcpd.service
-- name: configure dhcpd
+# configure dhcpd.conf
+- name: configure dhcpd.conf
   ansible.builtin.template:
     src: dhcpd.conf.j2
     dest: /etc/dhcp/dhcpd.conf
+
+# Reload the systemd manager configuration: 
+- name: reload the systemd manager configuration
+  ansible.builtin.systemd:
+    daemon_reload: yes
 
 # enable and start dhcpd.service
 - name: enable and start dhcpd.service

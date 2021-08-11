@@ -10,40 +10,43 @@ authoritative;
 
 subnet {{ dhcp_subnet.network }} netmask {{ dhcp_subnet.netmask }} {
   range {{ dhcp_subnet.range }};
-{% for dhcp_option in dhcpd_subnet.options %}
+{% for dhcp_option in dhcp_subnet.options %}
   {{ dhcp_option }};
 {% endfor %}
-{% for fixed_ip_host in dhcp_subnet.fixed_ip_hosts %}
-  host {{ fixed_ip_host.name }} {
-      hardware ethernet {{ fixed_ip_host.hardware_address }};
-      fixed-address {{ fixed_ip_host.fixed_ip_address }};
-  }
 }
 {% else %}
 {# render only network and netmask if the server does not provide a dhcp service to the subnet #} 
 subnet {{ dhcp_subnet.network }} netmask {{ dhcp_subnet.netmask }} {
 }
 {% endif %}
+
+{# render static hosts #} 
+{% for fixed_ip_host in dhcp_subnet.fixed_ip_hosts %}
+host {{ fixed_ip_host.name }} {
+    hardware ethernet {{ fixed_ip_host.hardware_address }};
+    fixed-address {{ fixed_ip_host.fixed_ip_address }};
+}
+{% endfor %}
+
 {% endfor %}
 
 {# render shared-networks if we have subnets not connected to dhcp server directly #}
 {% if dhcpd_subnets|selectattr("directly_connected_to_interface", "false")|list|length > 0 %}
-shared-network ext_net_1 {
+shared-network ext_net_0 {
 {% for dhcp_subnet in dhcpd_subnets|selectattr("directly_connected_to_interface", "false")|list %}  
   
-subnet {{ dhcp_subnet.network }} netmask {{ dhcp_subnet.netmask }} {
-  range {{ dhcp_subnet.range }};
-{% for dhcp_option in dhcpd_subnet.options %}
-  {{ dhcp_option }};
+  subnet {{ dhcp_subnet.network }} netmask {{ dhcp_subnet.netmask }} {
+    range {{ dhcp_subnet.range }};
+{% for dhcp_option in dhcp_subnet.options %}
+    {{ dhcp_option }};
 {% endfor %}
+  }
 {% for fixed_ip_host in dhcp_subnet.fixed_ip_hosts %}
   host {{ fixed_ip_host.name }} {
       hardware ethernet {{ fixed_ip_host.hardware_address }};
       fixed-address {{ fixed_ip_host.fixed_ip_address }};
   }
-}
-
+{% endfor %}
 {% endfor %}
 }
 {% endif %}
-
