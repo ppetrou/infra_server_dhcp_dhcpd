@@ -2,12 +2,34 @@
 # This is an example playbook to execute Ansible tests.
 
 - name: Verify
-  hosts: dhcpd_client
+  hosts: dhcpd_server
   gather_facts: false
   tasks:
-  - name: Example assertion
-    assert:
-      that: true
   
-  - name: dhcp lease test
-    command: dhclient -4 tap0 
+  - name: install diffutils and net-tools
+    dnf:
+      name: [diffutils, net-tools]
+      state: present
+
+  - name: Copy valid_dhcpd.service to test instance for comparison
+    ansible.builtin.copy:
+      src: ../files/valid_dhcpd.service
+      dest: /tmp/valid_dhcpd.service
+  
+  - name: Copy valid_dhcpd.conf to test instance for comparison
+    ansible.builtin.copy:
+      src: ../files/valid_dhcpd.conf
+      dest: /tmp/valid_dhcpd.conf
+
+  - name: validate /etc/systemd/system/dhcpd.service
+    shell: diff /etc/systemd/system/dhcpd.service /tmp/valid_dhcpd.service
+
+  - name: validate /etc/dhcp/dhcpd.conf
+    shell: diff /etc/dhcp/dhcpd.conf /tmp/valid_dhcpd.conf
+    register: diff_output
+  
+  - name: check if port 67 is listening
+    shell: netstat -unl | grep 67
+    register: netstat_output
+    failed_when: "netstat_output.stdout_lines|length != 1"
+
