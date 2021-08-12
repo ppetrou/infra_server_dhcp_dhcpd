@@ -1,4 +1,4 @@
-Role Name
+infra_server_dhcp_dhcpd
 =========
 
 A simple role to setup a dhcp service in a server with one or multiple nics, serving both direct and remote subnets.
@@ -6,7 +6,18 @@ A simple role to setup a dhcp service in a server with one or multiple nics, ser
 Requirements
 ------------
 
-NA
+* The dhcpd configuration provided MUST be correct. The role DOES NOT validate if the subnet values are correct or if something is missing at this version.
+* You also need to make sure that there is at least one subnet that is listening regardless if it serves a local subnet or not.
+
+Releases
+------------
+
+|Branch|Status|Description| Date
+|---	|---	|---	|---
+|master  	| Unstable	| Development Branch | Now
+|1.0.0  	| Release  	| Release 1.0.0 | 12-08-2021
+
+
 
 Role Variables
 --------------
