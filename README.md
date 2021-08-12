@@ -14,9 +14,8 @@ Releases
 
 |Branch|Status|Description| Date
 |---	|---	|---	|---
-|master  	| Unstable	| Development Branch | Now
-|1.0.0  	| Release  	| Release 1.0.0 | 12-08-2021
-
+|main|Unstable|Development Branch|Now
+|1.0.0|Release|Release 1.0.0|12-08-2021
 
 
 Role Variables
