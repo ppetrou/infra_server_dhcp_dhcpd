@@ -1,7 +1,7 @@
 Role Name
 =========
 
-A simple role to setup a dhcp service in a server with one or more nics, serving direct or remote subnets.
+A simple role to setup a dhcp service in a server with one or multiple nics, serving both direct and remote subnets.
 
 Requirements
 ------------
@@ -27,7 +27,7 @@ Role Variables
 |network|string|The network address of the subnet
 |netmask|string|The netmask address of the subnet
 |range|string|The ip range of the subnet served by the dhcp service
-|options|list(string)|dhcp options for the subnet. See https://www.iana.org/assignments/bootp-dhcp-parameters/bootp-dhcp-parameters.xhtml for full list.
+|options|list(string)|dhcp options for the subnet. You need to include the 'option' keyword if the option requires it. See https://www.iana.org/assignments/bootp-dhcp-parameters/bootp-dhcp-parameters.xhtml for full dhcp options list.
 |fixed_ip_hosts|list(dict)|Fixed hosts in the subnets
 
 **fixed_ip_hosts attributes**
@@ -39,42 +39,42 @@ Role Variables
 
 
 ```
-dhcpd_package: dhcp-server-12:4.4.2-11.b1.fc34
+dhcpd_package: dhcp-server-12:4.3.6-44.0.1.el8
 
 dhcpd_service_nics: 
-  - eth0
+  - tap0
 
 dhcpd_subnets:
-  - name: test1
+  - name: direct_net
     directly_connected_to_interface: yes
     provides_service: yes
-    network: a.b.c.d
-    netmask: e.f.g.h
-    range: a.b.c.d e.f.g.h;
+    network: 10.0.2.0
+    netmask: 255.255.255.0
+    range: 10.0.2.1 10.0.2.100
     options:
-      - "option value"
+      - "option domain-name-servers 192.0.2.1"
     fixed_ip_hosts:
-      - name: server1.example.com
-        hardware_address: AA:BB:CC:DD:EE
-        fixed_ip_address: a.b.c.d
-      - name: server2.example.com
-        hardware_address: AA:BB:CC:DD:E1
-        fixed_ip_address: e.f.g.h
-  - name: test2
-    directly_connected_to_interface: yes
+      - name: server1.direct.local
+        hardware_address: B7:55:40:09:AD:17
+        fixed_ip_address: 10.0.2.102
+      - name: server2.direct.local
+        hardware_address: E0:14:50:B2:2A:E1
+        fixed_ip_address: 10.0.2.105
+  - name: external_net
+    directly_connected_to_interface: no
     provides_service: yes
-    network: a.b.c.d
-    netmask: e.f.g.h
-    range: a.b.c.d e.f.g.h;
+    network: 10.0.3.0
+    netmask: 255.255.255.0
+    range: 10.0.3.1 10.0.3.110
     options:
-      - "option value"
+      - "option domain-name-servers 192.0.2.2"
     fixed_ip_hosts:
-      - name: server1.example.com
-        hardware_address: AA:BB:CC:DD:EE
-        fixed_ip_address: a.b.c.d
-      - name: server2.example.com
-        hardware_address: AA:BB:CC:DD:E1
-        fixed_ip_address: e.f.g.h
+      - name: server1.remote.external
+        hardware_address: CE:F9:41:68:CB:E8
+        fixed_ip_address: 10.0.3.121
+      - name: server2.remote.external
+        hardware_address: F4:E6:04:5E:6C:80
+        fixed_ip_address: 10.0.3.124
 ```
 
 
@@ -98,38 +98,38 @@ Example Playbook
     - role: infra_server_dhcp_dhcpd
       vars:
         dhcpd_service_nics: 
-          - eth0
+          - tap0
         dhcpd_subnets:
-          - name: test1
+          - name: direct_net
             directly_connected_to_interface: yes
             provides_service: yes
-            network: a.b.c.d
-            netmask: e.f.g.h
-            range: a.b.c.d e.f.g.h;
+            network: 10.0.2.0
+            netmask: 255.255.255.0
+            range: 10.0.2.1 10.0.2.100
             options:
-              - "option value"
+              - "option domain-name-servers 192.0.2.1"
             fixed_ip_hosts:
-              - name: server1.example.com
-                hardware_address: AA:BB:CC:DD:EE
-                fixed_ip_address: a.b.c.d
-              - name: server2.example.com
-                hardware_address: AA:BB:CC:DD:E1
-                fixed_ip_address: e.f.g.h
-          - name: test2
-            directly_connected_to_interface: yes
+              - name: server1.direct.local
+                hardware_address: B7:55:40:09:AD:17
+                fixed_ip_address: 10.0.2.102
+              - name: server2.direct.local
+                hardware_address: E0:14:50:B2:2A:E1
+                fixed_ip_address: 10.0.2.105
+          - name: external_net
+            directly_connected_to_interface: no
             provides_service: yes
-            network: a.b.c.d
-            netmask: e.f.g.h
-            range: a.b.c.d e.f.g.h;
+            network: 10.0.3.0
+            netmask: 255.255.255.0
+            range: 10.0.3.1 10.0.3.110
             options:
-              - "option value"
+              - "option domain-name-servers 192.0.2.2"
             fixed_ip_hosts:
-              - name: server1.example.com
-                hardware_address: AA:BB:CC:DD:EE
-                fixed_ip_address: a.b.c.d
-              - name: server2.example.com
-                hardware_address: AA:BB:CC:DD:E1
-                fixed_ip_address: e.f.g.h
+              - name: server1.remote.external
+                hardware_address: CE:F9:41:68:CB:E8
+                fixed_ip_address: 10.0.3.121
+              - name: server2.remote.external
+                hardware_address: F4:E6:04:5E:6C:80
+                fixed_ip_address: 10.0.3.124
 ```
 
 License
