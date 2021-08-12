@@ -28,6 +28,18 @@
     shell: diff /etc/dhcp/dhcpd.conf /tmp/valid_dhcpd.conf
     register: diff_output
   
+  - name: check that dhcp-server is running
+    ansible.builtin.systemd:
+      name: dhcpd
+      state: started
+    register: dhcpd_running
+    check_mode: true
+
+  - name: assert dhcpd is running
+    assert:
+      that:
+        - not dhcpd_running.changed
+  
   - name: check if port 67 is listening
     shell: netstat -unl | grep 67
     register: netstat_output

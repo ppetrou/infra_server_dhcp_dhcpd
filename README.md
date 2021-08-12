@@ -22,11 +22,11 @@ Role Variables
 --------------
 
 **top level vars**
-|Variable|Level|Description
-|---|---|---	
-|dhcpd_service_nics|Default|A list of network interfaces that listen for dhcp requests
-|dhcpd_subnets|Default|A list of subnets which will be served by the dhcp service
-|dhcpd_package|Default|The dhcpd package in a valid NEVRA or NSVCA form. https://docs.fedoraproject.org/en-US/modularity/architecture/nsvca/  	
+|Variable|Level|Type|Description
+|---|---|---|---	
+|dhcpd_service_nics|Default|list(string)|A list of network interfaces that listen for dhcp requests
+|dhcpd_subnets|Default|list(dict)|A list of subnets which will be served by the dhcp service
+|dhcpd_package|Vars|string|The dhcpd package in a valid NEVRA or NSVCA form. https://docs.fedoraproject.org/en-US/modularity/architecture/nsvca/  	
 
 **dhcpd_subnets attributes**
 |dhcpd_subnets|Type|Description
